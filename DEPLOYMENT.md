@@ -72,16 +72,18 @@ import { neon } from '@neondatabase/serverless';
 
 export default async function handler(req, res) {
   const sql = neon(process.env.DATABASE_URL);
-  
+
   if (req.method === 'GET') {
     // Fetch all users
     const users = await sql`SELECT * FROM users`;
     return res.status(200).json(users);
-  } 
-  
+  }
+
   if (req.method === 'POST') {
     // Create a user
-    const { name, email } = req.body;
+    // Vercel automatically parses JSON body, but handle edge cases
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { name, email } = body;
     const result = await sql`
       INSERT INTO users (name, email, created_at)
       VALUES (${name}, ${email}, NOW())
@@ -89,7 +91,7 @@ export default async function handler(req, res) {
     `;
     return res.status(201).json(result[0]);
   }
-  
+
   return res.status(405).json({ error: 'Method not allowed' });
 }
 ```

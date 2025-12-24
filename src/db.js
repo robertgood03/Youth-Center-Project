@@ -54,18 +54,6 @@ export const getDatabase = () => {
   return db;
 };
 
-// Example query function
-export const executeQuery = async (query, params = []) => {
-  try {
-    const sql = getDatabase();
-    const result = await sql(query, params);
-    return result;
-  } catch (error) {
-    console.error('Database query error:', error);
-    throw error;
-  }
-};
-
 // Example: Fetch all users
 export const getAllUsers = async () => {
   const sql = getDatabase();
