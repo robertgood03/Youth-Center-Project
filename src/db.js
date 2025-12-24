@@ -47,5 +47,3 @@ export const createUser = async (name, email) => {
   `;
   return result[0];
 };
-
-export default { getDatabase, executeQuery, getAllUsers, createUser };
