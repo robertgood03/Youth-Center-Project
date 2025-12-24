@@ -60,17 +60,63 @@ This project is configured for deployment on Vercel with Neon PostgreSQL databas
 
 ### 4. Using the Database
 
-The database connection is set up in `src/db.js`. Example usage:
+**Important Architecture Note:** Since this is a Vite React application that runs in the browser, you cannot import database functions directly into your React components. Database operations must happen server-side to protect your credentials and ensure security.
 
+#### Option A: Using Vercel Serverless Functions (Recommended)
+
+Create API routes in the `api/` directory at the root of your project. Vercel will automatically deploy these as serverless functions.
+
+**Example API Route** (`api/users.js`):
 ```javascript
-import { getAllUsers, createUser } from './db';
+import { neon } from '@neondatabase/serverless';
 
-// Fetch users
-const users = await getAllUsers();
-
-// Create a user
-const newUser = await createUser('John Doe', 'john@example.com');
+export default async function handler(req, res) {
+  const sql = neon(process.env.DATABASE_URL);
+  
+  if (req.method === 'GET') {
+    // Fetch all users
+    const users = await sql`SELECT * FROM users`;
+    return res.status(200).json(users);
+  } 
+  
+  if (req.method === 'POST') {
+    // Create a user
+    const { name, email } = req.body;
+    const result = await sql`
+      INSERT INTO users (name, email, created_at)
+      VALUES (${name}, ${email}, NOW())
+      RETURNING *
+    `;
+    return res.status(201).json(result[0]);
+  }
+  
+  return res.status(405).json({ error: 'Method not allowed' });
+}
 ```
+
+**Using the API from React components:**
+```javascript
+// In your React component
+const fetchUsers = async () => {
+  const response = await fetch('/api/users');
+  const users = await response.json();
+  return users;
+};
+
+const createUser = async (name, email) => {
+  const response = await fetch('/api/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email })
+  });
+  const newUser = await response.json();
+  return newUser;
+};
+```
+
+#### Option B: Using a Backend Framework
+
+Alternatively, you can set up a separate backend server (Express, Fastify, etc.) and deploy it separately, then configure your React app to call that backend's API endpoints.
 
 ### 5. Create Database Tables
 
@@ -96,3 +142,4 @@ You can run SQL queries in the Neon Console SQL Editor.
 - Never commit `.env.local` or `.env` files to Git
 - The Neon serverless driver is optimized for edge functions and Vercel
 - For production, always use environment variables in Vercel dashboard
+- **Database operations must run server-side:** Create API routes (Vercel serverless functions) to handle database queries. Never expose database credentials or execute queries directly from React components running in the browser
