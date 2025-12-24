@@ -1,10 +1,3 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 3000,
-    open: true
-  }
-})
+// This file was replaced to avoid ambiguity with vite.config.mjs
+// The active ESM config is in vite.config.mjs
+export default {}
