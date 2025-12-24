@@ -90,7 +90,6 @@ You can run SQL queries in the Neon Console SQL Editor.
 ## Environment Variables
 
 - `DATABASE_URL` - Your Neon PostgreSQL connection string (required)
-- `VITE_DATABASE_URL` - Alternative for client-side usage (if needed)
 
 ## Notes
 
