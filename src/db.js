@@ -6,7 +6,7 @@ let db = null;
 
 export const getDatabase = () => {
   if (!db) {
-    const databaseUrl = import.meta.env.VITE_DATABASE_URL || process.env.DATABASE_URL;
+    const databaseUrl = process.env.DATABASE_URL;
     
     if (!databaseUrl) {
       throw new Error('DATABASE_URL is not defined. Please set it in your environment variables.');
