@@ -12,8 +12,10 @@ build/
 .env.test.local
 .env.production.local
 
+# Vercel
+.vercel
+
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
